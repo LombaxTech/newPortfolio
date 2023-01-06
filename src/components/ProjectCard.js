@@ -3,7 +3,30 @@ import { Col } from "react-bootstrap";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+export default function useScreenWidth() {
+  const [windowWidth, setWindowWidth] = useState(null);
+
+  const isWindow = typeof window !== "undefined";
+
+  const getWidth = () => (isWindow ? window.innerWidth : windowWidth);
+
+  const resize = () => setWindowWidth(getWidth());
+
+  useEffect(() => {
+    if (isWindow) {
+      setWindowWidth(getWidth());
+
+      window.addEventListener("resize", resize);
+
+      return () => window.removeEventListener("resize", resize);
+    }
+    //eslint-disable-next-line
+  }, [isWindow]);
+
+  return windowWidth;
+}
 
 export const ProjectCard = ({
   title,
@@ -19,6 +42,10 @@ export const ProjectCard = ({
   builtUsing,
 }) => {
   const [show, setShow] = useState(false);
+
+  const widthSize = useScreenWidth();
+
+  const mobileWidth = 400;
 
   return (
     // <Col size={12} sm={6} md={4}>
@@ -129,8 +156,10 @@ export const ProjectCard = ({
                 <div class="tw-flex tw-justify-center">
                   <iframe
                     src={youtubeLink}
-                    width="600"
-                    height="393"
+                    // width="600"
+                    width="100%"
+                    // height="393"
+                    height={widthSize <= 500 ? "200" : "393"}
                     // title="ThingPilot - IoT Platform - Deploying a Device"
                     frameborder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
